@@ -1,0 +1,136 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Zerv — iDine Integration",
+    "description": "Inbound APIs exposed by zerv-user-service for iDine/POS, plus reference requests for iDine staging webhooks (called by Zerv in production).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3004/api/zerv-user-service"
+    },
+    {
+      "key": "idineInboundSecret",
+      "value": "your-IDINE_INBOUND_SECRET"
+    },
+    {
+      "key": "idineStagingBase",
+      "value": "https://demoposidine.innosolv-idine.com/api/iDineIntAggregators"
+    }
+  ],
+  "item": [
+    {
+      "name": "Inbound — Zerv (iDine / POS → Zerv)",
+      "item": [
+        {
+          "name": "Menu catalogue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idine-Secret",
+                "value": "{{idineInboundSecret}}",
+                "description": "Must match IDINE_INBOUND_SECRET when NODE_ENV=production"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flush_categories\": true,\n  \"flush_items\": true,\n  \"flush_options\": true,\n  \"flush_option_groups\": true,\n  \"categories\": [\n    {\n      \"ref_id\": \"50\",\n      \"name\": \"BEVERAGES\",\n      \"description\": \"BEVERAGES\",\n      \"sort_order\": 0,\n      \"active\": true,\n      \"img_url\": \"https://example.com/cat.jpg\",\n      \"translations\": []\n    }\n  ],\n  \"items\": [\n    {\n      \"ref_id\": \"ITM0015355-NOS-1\",\n      \"title\": \"SHIKANJI\",\n      \"available\": true,\n      \"description\": \"Lemon based drink\",\n      \"sold_at_store\": true,\n      \"price\": 195,\n      \"current_stock\": -1,\n      \"recommended\": false,\n      \"food_type\": \"1\",\n      \"category_ref_ids\": [\"50\"],\n      \"translations\": [],\n      \"tags\": {},\n      \"excluded_platforms\": []\n    }\n  ],\n  \"taxes\": [],\n  \"option_groups\": [],\n  \"options\": [],\n  \"charges\": [],\n  \"ErrorMessage\": null\n}"
+            },
+            "url": "{{baseUrl}}/integrations/idine/menu-catalogue",
+            "description": "POST full or delta menu snapshot (partner doc: Menu catalogue upload)."
+          },
+          "response": []
+        },
+        {
+          "name": "Order status update (POS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idine-Secret",
+                "value": "{{idineInboundSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_state\": \"Acknowledged\",\n  \"order_id\": 289506144,\n  \"timestamp\": \"14/10/2022 13:46:59\",\n  \"store_upipr_id\": 33462,\n  \"prev_state\": \"Placed\",\n  \"updater\": {\n    \"username\": \"sys_user_prime\",\n    \"name\": \"Prime API Access\"\n  },\n  \"timestamp_unix\": 1665735419000,\n  \"message\": \"Updated By op lakshmi\",\n  \"additional_info\": {\n    \"external_channel\": {\n      \"order_id\": \"148810566500\",\n      \"name\": \"Swiggy\"\n    }\n  },\n  \"store_id\": \"4976c068a64c12397f28e627f01c864ade91ae6f78b691fa\"\n}"
+            },
+            "url": "{{baseUrl}}/integrations/idine/order-status-update",
+            "description": "POS-initiated lifecycle updates (partner doc: Order Status Change)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reference — iDine staging webhooks (Zerv → iDine)",
+      "description": "Zerv calls these from IdineOutboundService. Use to simulate payloads iDine expects or to verify connectivity from your network.",
+      "item": [
+        {
+          "name": "Webhook — Place order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {\n    \"phone\": \"04448130732\",\n    \"email\": \"zomato_dflt_user@email.com\",\n    \"name\": \"Pravin Kumar\",\n    \"address\": {\n      \"is_guest_mode\": false,\n      \"city\": \"Coimbatore\",\n      \"landmark\": \"\",\n      \"pin\": \"\",\n      \"longitude\": 0.0,\n      \"latitude\": 0.0,\n      \"tag\": \"hub_zomato\",\n      \"line_1\": \"\",\n      \"line_2\": null,\n      \"sub_locality\": \"Example locality\"\n    }\n  },\n  \"order\": {\n    \"next_states\": [\"Acknowledged\", \"Food Ready\", \"Dispatched\", \"Completed\", \"Cancelled\"],\n    \"items\": [],\n    \"details\": {\n      \"state\": \"Placed\",\n      \"order_type\": \"delivery\",\n      \"payable_amount\": 165.0,\n      \"order_total\": 165.0,\n      \"channel\": \"zerv\"\n    },\n    \"payment\": [{\"amount\": 165.0, \"option\": \"payment_gateway\", \"srvr_trx_id\": null}],\n    \"store\": {\n      \"name\": \"Demo store\",\n      \"merchant_ref_id\": \"4976c068a64c1239b5fa4ee3549ee80b93ad17a79221d872\",\n      \"latitude\": 12.97,\n      \"longitude\": 77.73\n    }\n  }\n}"
+            },
+            "url": "{{idineStagingBase}}/WebhookForPlaceOrder"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook — Order status update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_state\": \"Food Ready\",\n  \"order_id\": 289506144,\n  \"timestamp\": \"14/10/2022 13:49:15\",\n  \"store_upipr_id\": 33462,\n  \"prev_state\": \"Acknowledged\",\n  \"updater\": {\n    \"username\": \"sys_user_prime\",\n    \"name\": \"Prime API Access\"\n  },\n  \"timestamp_unix\": 1665735555000,\n  \"message\": \"Updated By op lakshmi\",\n  \"store_id\": \"4976c068a64c12397f28e627f01c864ade91ae6f78b691fa\"\n}"
+            },
+            "url": "{{idineStagingBase}}/WebhookForOrderStatusUpdate"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook — Order delivery status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_state\": \"Dispatched\",\n  \"order_id\": 289506144,\n  \"message\": \"Rider is out for delivery\",\n  \"timestamp_unix\": 1665736196000\n}"
+            },
+            "url": "{{idineStagingBase}}/WebhookForOrderDeliveryStatus"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

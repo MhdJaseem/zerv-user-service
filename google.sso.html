@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google SSO</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: #e9edf7;
+            color: #1f2430;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .google-icon-box {
+            width: 62px;
+            height: 62px;
+            margin: 0 auto 18px;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 8px 22px rgba(43, 52, 69, 0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 46px;
+            line-height: 1.06;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            color: #171a22;
+        }
+
+        .subtitle {
+            margin: 12px 0 28px;
+            font-size: 33px;
+            line-height: 1.08;
+            font-weight: 500;
+            color: #3c4353;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 26px 24px 22px;
+            box-shadow: 0 12px 36px rgba(36, 43, 60, 0.14);
+            text-align: left;
+        }
+
+        .card h2 {
+            margin: 0 0 6px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 700;
+            color: #202430;
+        }
+
+        .card .helper {
+            margin: 0 0 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #666d7e;
+        }
+
+        .google-btn {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #d9dce4;
+            border-radius: 8px;
+            background: #fff;
+            color: #2e3442;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .google-btn:hover {
+            background: #f7f8fb;
+        }
+
+        .divider {
+            margin: 18px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8c92a0;
+            font-size: 14px;
+            justify-content: center;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            height: 1px;
+            background: #e3e6ee;
+            width: 35%;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2a2f3a;
+        }
+
+        .email-input {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #d7dbe5;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: #262b38;
+            outline: none;
+        }
+
+        .email-input:focus {
+            border-color: #8ca2ff;
+            box-shadow: 0 0 0 3px rgba(94, 114, 255, 0.12);
+        }
+
+        .continue-btn {
+            margin-top: 18px;
+            width: 100%;
+            height: 44px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #3f4451, #252a35);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .footer {
+            margin-top: 18px;
+            border-top: 1px solid #eceff5;
+            padding-top: 16px;
+            text-align: center;
+            font-size: 15px;
+            color: #737988;
+        }
+
+        .footer a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #2a2f3a;
+        }
+
+        .api-response {
+            margin-top: 16px;
+            border: 1px solid #e3e6ee;
+            border-radius: 10px;
+            background: #f8f9fc;
+            padding: 12px;
+            max-height: 220px;
+            overflow: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.45;
+            color: #1c2330;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrapper">
+        <div class="google-icon-box" aria-hidden="true">
+            <svg width="34" height="34" viewBox="0 0 24 24">
+                <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"></path>
+                <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"></path>
+                <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"></path>
+                <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"></path>
+            </svg>
+        </div>
+
+        <h1 class="title">Welcome back</h1>
+        <p class="subtitle">Sign in to continue to your account</p>
+
+        <section class="card">
+            <h2>Sign in to Google Auth Display</h2>
+            <p class="helper">Welcome back! Please sign in to continue</p>
+
+            <button class="google-btn" type="button" onclick="googleLogin()">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"></path>
+                    <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"></path>
+                    <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"></path>
+                    <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"></path>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="divider">or</div>
+
+            <label class="label" for="email">Email address</label>
+            <input class="email-input" id="email" type="email" placeholder="Enter your email address" />
+            <button class="continue-btn" type="button">Continue</button>
+
+            <div class="footer">
+                Don't have an account? <a href="#">Sign up</a>
+            </div>
+
+            <pre class="api-response" id="apiResponse">Waiting for Google login response...</pre>
+        </section>
+    </main>
+    <script>
+        const API_BASE = "http://localhost:3004/api/zerv-user-service/auth";
+        const apiResponse = document.getElementById("apiResponse");
+
+        function setResponse(value) {
+            apiResponse.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        }
+
+        function googleLogin() {
+            window.location.href = `${API_BASE}/google`;
+        }
+
+        async function processGoogleCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get("code");
+            const state = params.get("state");
+            const error = params.get("error");
+
+            if (error) {
+                setResponse({ status: "error", error, details: params.get("error_description") || "Google OAuth failed" });
+                return;
+            }
+
+            if (!code) {
+                setResponse("Waiting for Google login response...");
+                return;
+            }
+
+            try {
+                const callbackUrl = `${API_BASE}/google/callback?code=${encodeURIComponent(code)}${state ? `&state=${encodeURIComponent(state)}` : ""}`;
+                const res = await fetch(callbackUrl, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                const data = await res.json();
+                setResponse(data);
+            } catch (err) {
+                setResponse({ status: "error", message: err.message || "Failed to call callback API" });
+            }
+        }
+
+        processGoogleCallback();
+    </script>
+</body>
+
+</html>
